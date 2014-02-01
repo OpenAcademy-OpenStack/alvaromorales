@@ -34,18 +34,16 @@ OS_IMAGE_ENDPOINT = keystone_client.service_catalog.url_for(
 glance_client = gclient.Client('1', endpoint=OS_IMAGE_ENDPOINT,
                                token=OS_AUTH_TOKEN)
 
-images = glance_client.images.list()
-
 # Create image
 
+images = glance_client.images.list()
+
 image_prefix = 'ubuntu'
-flavor_small = nova_client.flavors.list()[1]
+flavor_tiny = nova_client.flavors.find(name='m1.tiny')
 
 for image in images:
     if image.name.startswith(image_prefix):
-        image_id = image.id
-        break
-
-nova_client.servers.create(name='ubuntu_small_' + str(time.time()),
-                           image=image_id,
-                           flavor=flavor_small)
+        print "Creating %s image with flavor %s." % (image.name, flavor_tiny.name)
+        nova_client.servers.create(name='ubuntu_small_' + str(time.time()),
+                           image=image.id,
+                           flavor=flavor_tiny)
